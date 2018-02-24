@@ -1,9 +1,16 @@
 import { Component, OnInit} from '@angular/core';
 import { Recipe } from '../recipe.model';
-import { RecipeService } from '../recipe.service';
+
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Ingredient } from '../../shared/ingredient.model';
+import * as shoppingList from '../../shopping-list/store/shopping-list.actions';
+import * as fromApp from '../../store/app.reducers';
+import * as fromRecipe from '../store/recipes.reducers';
+import * as RecipeActions from '../store/recipes.actions';
 
-
+import { Observable } from 'rxjs/Observable';
+import {take} from 'rxjs/operators';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -11,30 +18,38 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
   styleUrls: ['./recipe-detail.component.css']
 })
 export class RecipeDetailComponent implements OnInit {
-  recipe: Recipe;
+  recipeState: Observable<fromRecipe.State>;
   id: number;
 
-  constructor(private recipeService: RecipeService,
-  private route: ActivatedRoute, private router: Router) { }
+  constructor(
+  private route: ActivatedRoute, private router: Router,
+  private store: Store<fromRecipe.RecipeFeatureState>) { }
 
 
   onAddToShoppingList() {
-  this.recipeService.onAddIngredientsToShoppingList(this.recipe.ingredients);
+    this.store.select('recipes').pipe(take(1))
+    .subscribe((recipeState: fromRecipe.State) => {
+      this.store.dispatch(new shoppingList.AddIngredients(recipeState.recipes[this.id].ingredients));
+
+
+    });
+
   }
+
 
   onEditRecipe() {
     this.router.navigate(['edit'], {relativeTo: this.route});
   }
 
   onDeleteRecipe() {
-    this.recipeService.deleteRecipe(this.id);
+    this.store.dispatch(new RecipeActions.DeleteRecipe(this.id));
     this.router.navigate(['/recipes']);
 
   }
   ngOnInit() {
     this.route.params.subscribe((params: Params) => {
       this.id = +params['id'];
-     this.recipe = this.recipeService.getRecipe(this.id);
+     this.recipeState = this.store.select('recipes');
     });
   }
 

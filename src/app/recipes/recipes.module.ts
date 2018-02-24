@@ -12,6 +12,10 @@ import { RecipeStartComponent } from './recipe-start/recipe-start.component';
 import { RecipesRoutingModule } from './recipes-routing.module';
 import { SharedModule } from '../shared/shared.module';
 import { AuthGuard } from '../auth/auth-guard.service';
+import { StoreModule } from '@ngrx/store';
+import { recipesReducer } from './store/recipes.reducers';
+import { EffectsModule } from '@ngrx/effects';
+import { RecipeEffects } from './store/recipes.effects';
 
 
 
@@ -29,7 +33,9 @@ import { AuthGuard } from '../auth/auth-guard.service';
     imports: [
         ReactiveFormsModule,
         RecipesRoutingModule,
-        SharedModule
+        SharedModule,
+        StoreModule.forFeature('recipes', recipesReducer),
+        EffectsModule.forFeature([RecipeEffects])
     ],
     providers: [AuthGuard]
 })
