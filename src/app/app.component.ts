@@ -9,10 +9,12 @@ import * as firebase from 'firebase';
 export class AppComponent implements OnInit {
 
   ngOnInit() {
+   // if (!firebase.apps.length) {
     firebase.initializeApp({
      apiKey: 'AIzaSyCrmvfy4hkdZZ77FBmQsQ1k648g-ER1YfU',
     authDomain: 'recipe-app-3393.firebaseapp.com'
     });
+  // }
   }
 
 }
